@@ -11,7 +11,22 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+
+    if params[:sort] == "title" 
+      @movies=Movie.all.order(:title)
+    elsif params[:sort]== "release_date"
+      @movies=Movie.all.order(:release_date)
+    else
+      @movies = Movie.all
+    end
+
+    selected_ratings = Movie.all_ratings
+    if params[:ratings].present?
+      selected_ratings = params[:ratings].keys
+      @movies = @movies.where(rating: params[:ratings].keys)
+    end
+
+    @all_ratings = Movie.all_ratings.map{ |rating| {name: rating, checked: selected_ratings.include?(rating)}}
   end
 
   def new
