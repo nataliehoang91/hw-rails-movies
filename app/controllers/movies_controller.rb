@@ -11,7 +11,19 @@ class MoviesController < ApplicationController
   end
 
   def index
+     if !params[:sort].present? && session[:sort].present?
+      redirect_to movies_path({:sort => session[:sort]}.merge(params))
+      return
+    end
+    
+    if !params[:ratings].present? && session[:ratings].present?
+      redirect_to movies_path({:ratings => session[:ratings]}.merge(params))
+      return
+    end
 
+    session[:sort] = params[:sort]
+    session[:ratings] = params[:ratings]
+    
     if params[:sort] == "title" 
       @movies=Movie.all.order(:title)
     elsif params[:sort]== "release_date"
@@ -21,6 +33,7 @@ class MoviesController < ApplicationController
     end
 
     selected_ratings = Movie.all_ratings
+    
     if params[:ratings].present?
       selected_ratings = params[:ratings].keys
       @movies = @movies.where(rating: params[:ratings].keys)
